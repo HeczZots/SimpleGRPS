@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package gRPC;
+import "google/protobuf/empty.proto";
+option go_package = "/home/im/gRPC";
+
+message AuthRequest {
+    string login = 1;
+    string password = 2;
+}
+
+message DataRequest {
+    int32 interval_ms = 1;
+}
+
+message DataResponse {
+    int64 value = 1;
+}
+
+message StopRequest {
+}
+
+service DataService {
+    rpc Authenticate(AuthRequest) returns (google.protobuf.Empty);
+    
+    rpc StartServer(DataRequest) returns (stream DataResponse);
+    
+    rpc StopData(StopRequest) returns (google.protobuf.Empty);
+}
