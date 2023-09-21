@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"gRPC/internal/api/caches"
 	pb "gRPC/internal/api/proto"
 	"log"
@@ -24,7 +23,7 @@ func (c *Controler) GetData(buffer *caches.Buffer, stream pb.DataService_StartSe
 			log.Fatalf("Ошибка при получении данных: %v", err)
 			break
 		}
-		fmt.Printf("Получено: %v\n", response.Value)
+		log.Printf("Получено: %v\n", response.Value)
 		buffer.Insert(response.Value, time.Now())
 		// В этом месте можно добавить логику обработки полученных данных.
 	}

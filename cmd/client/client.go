@@ -38,6 +38,7 @@ func main() {
 		Login:    p.Login,
 		Password: p.Password,
 	}
+
 	_, err = client.Authenticate(context.Background(), authRequest)
 	if err != nil {
 		log.Fatalf("Ошибка при аутентификации: %v", err)
