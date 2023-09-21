@@ -22,8 +22,8 @@ func main() {
 	s := grpc.NewServer()
 	pb.RegisterDataServiceServer(s, &handlers.DataServiceServer{})
 
-	log.Printf("Сервер запущен на %v", lis.Addr())
+	log.Printf("Server started at %v", lis.Addr())
 	if err := s.Serve(lis); err != nil {
-		log.Fatalf("Ошибка при запуске сервера: %v", err)
+		log.Fatalf("Error launch server: %v", err)
 	}
 }

@@ -28,7 +28,7 @@ func main() {
 	//без grpc.WithInsecure()
 	conn, err := grpc.Dial(p.Host+p.Port, grpc.WithInsecure())
 	if err != nil {
-		log.Fatalf("Не удалось установить соединение: %v", err)
+		log.Fatalf("error to dial connection: %v", err)
 	}
 	defer conn.Close()
 
@@ -41,7 +41,7 @@ func main() {
 
 	_, err = client.Authenticate(context.Background(), authRequest)
 	if err != nil {
-		log.Fatalf("Ошибка при аутентификации: %v", err)
+		log.Fatalf("auth error: %v", err)
 	}
 
 	dataRequest := &pb.DataRequest{
@@ -49,7 +49,7 @@ func main() {
 	}
 	stream, err := client.StartServer(context.Background(), dataRequest)
 	if err != nil {
-		log.Fatalf("Ошибка при начале передачи данных: %v", err)
+		log.Fatalf("error stream creation: %v", err)
 	}
 
 	select {
@@ -60,7 +60,7 @@ func main() {
 		buffer = caches.NewBuffer(p.BufferCapacity)
 		wg := &sync.WaitGroup{}
 		wg.Add(1)
-		go receiver.GetData(buffer, stream, wg)
+		go receiver.GetData(p.TTL, buffer, stream, wg)
 		wg.Wait()
 	}
 

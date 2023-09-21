@@ -15,7 +15,7 @@ type DataServiceServer struct {
 }
 
 func (s *DataServiceServer) Authenticate(ctx context.Context, in *pb.AuthRequest) (*emptypb.Empty, error) {
-	log.Printf("Получен запрос на аутентификацию. Логин: %s, Пароль: %s\n", in.GetLogin(), in.GetPassword())
+	log.Printf("Auth received. Log: %s, Pass: %s\n", in.GetLogin(), in.GetPassword())
 	return &emptypb.Empty{}, nil
 }
 
@@ -24,7 +24,7 @@ func (s *DataServiceServer) StartServer(in *pb.DataRequest, stream pb.DataServic
 	for i := int64(1); ; i++ {
 		select {
 		case <-stream.Context().Done():
-			log.Printf("Клиент закрыл стрим передачи данных.")
+			log.Printf("Client closed connection.")
 			return nil
 		case <-time.After(interval):
 			// Отправляем данные клиенту.

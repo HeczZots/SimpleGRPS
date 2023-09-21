@@ -16,16 +16,20 @@ func NewReceiver() *Controler {
 }
 
 // Принимаем и обрабатываем данные от сервера.
-func (c *Controler) GetData(buffer *caches.Buffer, stream pb.DataService_StartServerClient, wg *sync.WaitGroup) {
+func (c *Controler) GetData(d time.Duration, buffer *caches.Buffer, stream pb.DataService_StartServerClient, wg *sync.WaitGroup) {
+	startTime := time.Now()
 	for i := buffer.Capacity; i > 0; i-- {
 		response, err := stream.Recv()
 		if err != nil {
-			log.Fatalf("Ошибка при получении данных: %v", err)
+			log.Fatalf("Error in getting data: %v", err)
 			break
 		}
-		log.Printf("Получено: %v\n", response.Value)
+		if time.Since(startTime) > d {
+			log.Printf("Duration %v has expired\n", d)
+			break
+		}
+		log.Printf("Received: %v\n", response.Value)
 		buffer.Insert(response.Value, time.Now())
-		// В этом месте можно добавить логику обработки полученных данных.
 	}
 	wg.Done()
 }
