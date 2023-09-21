@@ -15,6 +15,7 @@ import (
 
 func main() {
 	p := GetParams()
+	//без grpc.WithInsecure()
 	conn, err := grpc.Dial(p.Host+p.Port, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("Не удалось установить соединение: %v", err)
