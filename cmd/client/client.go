@@ -7,24 +7,32 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"sync"
 
+	"gRPC/internal/api/caches"
+	"gRPC/internal/api/handlers"
 	pb "gRPC/internal/api/proto"
 
 	"google.golang.org/grpc"
 )
 
+var p *Flags
+var conn *grpc.ClientConn
+var client pb.DataServiceClient
+var stream pb.DataService_StartServerClient
+var receiver *handlers.Controler
+var buffer *caches.Buffer
+
 func main() {
-	p := GetParams()
+	p = GetParams()
 	//без grpc.WithInsecure()
 	conn, err := grpc.Dial(p.Host+p.Port, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("Не удалось установить соединение: %v", err)
 	}
 	defer conn.Close()
-	// go func(){
-	// add interupt
-	// }
-	client := pb.NewDataServiceClient(conn)
+
+	client = pb.NewDataServiceClient(conn)
 
 	authRequest := &pb.AuthRequest{
 		Login:    p.Login,
@@ -42,17 +50,20 @@ func main() {
 	if err != nil {
 		log.Fatalf("Ошибка при начале передачи данных: %v", err)
 	}
-	defer stream.CloseSend()
 
-	// Принимаем и обрабатываем данные от сервера.
-	for {
-		response, err := stream.Recv()
-		if err != nil {
-			log.Fatalf("Ошибка при получении данных: %v", err)
-			break
-		}
-		fmt.Printf("Получено: %v\n", response.Value)
+	select {
+	case <-stream.Context().Done():
+		stream.CloseSend()
+	default:
+		receiver = handlers.NewReceiver()
+		buffer = caches.NewBuffer(p.BufferCapacity)
+		wg := &sync.WaitGroup{}
+		wg.Add(1)
+		go receiver.GetData(buffer, stream, wg)
+		wg.Wait()
+	}
 
-		// В этом месте можно добавить логику обработки полученных данных.
+	for _, v := range buffer.Arr {
+		fmt.Printf("Value: %v \tTime: %v\n", v.Value, v.TS.Format("15:04:05.000"))
 	}
 }
