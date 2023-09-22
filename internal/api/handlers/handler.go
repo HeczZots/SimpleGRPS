@@ -29,6 +29,7 @@ func (s *DataServiceServer) StartServer(in *pb.DataRequest, stream pb.DataServic
 		case <-time.After(interval):
 			// Отправляем данные клиенту.
 			response := &pb.DataResponse{Value: i}
+			log.Println("data sended: ", response.Value)
 			if err := stream.Send(response); err != nil {
 				return err
 			}

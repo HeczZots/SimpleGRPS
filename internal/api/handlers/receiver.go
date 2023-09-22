@@ -28,7 +28,6 @@ func (c *Controler) GetData(d time.Duration, buffer *caches.Buffer, stream pb.Da
 			log.Printf("Duration %v has expired\n", d)
 			break
 		}
-		log.Printf("Received: %v\n", response.Value)
 		buffer.Insert(response.Value, time.Now())
 	}
 	wg.Done()
