@@ -13,15 +13,21 @@ import (
 	"google.golang.org/grpc"
 )
 
+const defaultPort = ":8080"
+
+var lis net.Listener
+var s *grpc.Server
+var listenPort *string
+
 func main() {
-	listenPort := flag.String("p", ":8080", "enter server port")
+	listenPort := flag.String("p", defaultPort, "enter server port")
 	flag.Parse()
 
 	lis, err := net.Listen("tcp", *listenPort)
 	if err != nil {
 	}
 
-	s := grpc.NewServer()
+	s = grpc.NewServer()
 	pb.RegisterDataServiceServer(s, &handlers.DataServiceServer{})
 
 	log.Printf("Server started at %v", lis.Addr())

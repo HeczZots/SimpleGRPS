@@ -4,10 +4,8 @@ client
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
-	"sync"
 	"time"
 
 	"gRPC/internal/api/caches"
@@ -16,13 +14,6 @@ import (
 
 	"google.golang.org/grpc"
 )
-
-var p *Flags
-var conn *grpc.ClientConn
-var client pb.DataServiceClient
-var stream pb.DataService_StartServerClient
-var receiver *handlers.Controler
-var buffer *caches.Buffer
 
 const (
 	defaultPort       = ":8080"
@@ -34,8 +25,15 @@ const (
 	defaultCapacity   = 50
 )
 
+var p *Flags
+var conn *grpc.ClientConn
+var client pb.DataServiceClient
+var stream pb.DataService_StartServerClient
+var receiver *handlers.Controler
+var buffer *caches.Buffer
+
 func main() {
-	p = GetParams()
+	p = getParams()
 	url := p.Host + p.Port
 	//без grpc.WithInsecure() не работает(нужно разобраться)
 	conn, err := grpc.Dial(url, grpc.WithInsecure())
@@ -60,37 +58,6 @@ func main() {
 	outPut(buffer)
 }
 
-func authenticate(client pb.DataServiceClient, l, p string) (err error) {
-	authRequest := &pb.AuthRequest{
-		Login:    l,
-		Password: p,
-	}
-	_, err = client.Authenticate(context.Background(), authRequest)
-	return err
-}
-
-func startStream(client pb.DataServiceClient, ts int32) (err error) {
-	dataRequest := &pb.DataRequest{
-		IntervalMs: int32(p.TS),
-	}
-	stream, err = client.StartServer(context.Background(), dataRequest)
-	if err != nil {
-		return err
-	}
-	log.Println("Stream started")
-	select {
-	case <-stream.Context().Done():
-		stream.CloseSend()
-	default:
-		receiver = handlers.NewReceiver()
-		buffer = caches.NewBuffer(p.BufferCapacity)
-		wg := &sync.WaitGroup{}
-		wg.Add(1)
-		go receiver.GetData(p.TTL, buffer, stream, wg)
-		wg.Wait()
-	}
-	return nil
-}
 func outPut(buffer *caches.Buffer) {
 	for _, v := range buffer.Arr {
 		fmt.Printf("Value: %v \tTime: %v\n", v.Value, v.TS.Format("15:04:05.000"))
