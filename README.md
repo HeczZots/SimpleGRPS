@@ -1,4 +1,4 @@
-# SimpleGRPS
+# SimpleGRPС
 *Project*
 # Запуск осуществляется через makefile
 make build - компилирование проекта
