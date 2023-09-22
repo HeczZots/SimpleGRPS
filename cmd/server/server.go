@@ -26,7 +26,6 @@ func main() {
 	lis, err := net.Listen("tcp", *listenPort)
 	if err != nil {
 	}
-
 	s = grpc.NewServer()
 	pb.RegisterDataServiceServer(s, handlers.NewService())
 

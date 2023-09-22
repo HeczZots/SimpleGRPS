@@ -34,18 +34,18 @@ func (s *DataServiceServer) Authenticate(ctx context.Context, in *pb.AuthRequest
 	return &emptypb.Empty{}, nil
 }
 
-func (s *DataServiceServer) StartServer(ar *pb.AuthRequest, in *pb.DataRequest, stream pb.DataService_StartServerServer) error {
+func (s *DataServiceServer) StartServer(in *pb.DataRequest, stream pb.DataService_StartServerServer) error {
 	interval := time.Duration(in.GetIntervalMs()) * time.Millisecond
 	for i := int64(1); ; i++ {
 		select {
 		case <-stream.Context().Done():
 			log.Printf("Client closed connection.")
 			s.Clients.ViewActiveSessions()
-			s.Clients.CloseAuth(ar.GetLogin())
+			// s.Clients.CloseAuth(in.GetStreamName())
 			return nil
 		case <-time.After(interval):
 			response := &pb.DataResponse{Value: i}
-			log.Println("data sended: to user: ", response.Value, ar.GetLogin())
+			log.Println("data send: to user: ", response.Value)
 			if err := stream.Send(response); err != nil {
 				return err
 			}

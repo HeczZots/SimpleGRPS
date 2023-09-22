@@ -13,6 +13,7 @@ import (
 	pb "gRPC/internal/api/proto"
 
 	"google.golang.org/grpc"
+	// "google.golang.org/grpc/credentials/insecure"
 )
 
 const (
@@ -44,6 +45,11 @@ func main() {
 	log.Println("Connection succesful")
 
 	client = pb.NewDataServiceClient(conn)
+	// authRequest := &pb.AuthRequest{
+	// 	Login:    p.Login,
+	// 	Password: p.Password,
+	// }
+	// _, err = client.Authenticate(context.Background(), authRequest)
 	err = authenticate(client, p.Login, p.Password)
 	if err != nil {
 		log.Fatalf("Auth error: %v", err)
