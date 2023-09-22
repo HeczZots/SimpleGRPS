@@ -13,6 +13,7 @@ import (
 	pb "gRPC/internal/api/proto"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 const (
@@ -36,7 +37,7 @@ func main() {
 	p = getParams()
 	url := p.Host + p.Port
 	//без grpc.WithInsecure() не работает(нужно разобраться)
-	conn, err := grpc.Dial(url, grpc.WithInsecure())
+	conn, err := grpc.Dial(url, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("error to dial connection: %v", err)
 	}
@@ -50,7 +51,7 @@ func main() {
 	}
 	log.Println("Authentification succesful")
 
-	err = startStream(client, int32(p.TS))
+	err = startStream(client, int32(p.TS), p.Login)
 	if err != nil {
 		log.Fatalf("error stream creation: %v", err)
 	}

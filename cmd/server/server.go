@@ -28,7 +28,7 @@ func main() {
 	}
 
 	s = grpc.NewServer()
-	pb.RegisterDataServiceServer(s, &handlers.DataServiceServer{})
+	pb.RegisterDataServiceServer(s, handlers.NewService())
 
 	log.Printf("Server started at %v", lis.Addr())
 	if err := s.Serve(lis); err != nil {

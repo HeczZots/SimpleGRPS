@@ -50,9 +50,10 @@ func authenticate(client pb.DataServiceClient, l, p string) (err error) {
 	return err
 }
 
-func startStream(client pb.DataServiceClient, ts int32) (err error) {
+func startStream(client pb.DataServiceClient, ts int32, l string) (err error) {
 	dataRequest := &pb.DataRequest{
-		IntervalMs: int32(p.TS),
+		IntervalMs: ts,
+		Login:      l,
 	}
 	stream, err = client.StartServer(context.Background(), dataRequest)
 	if err != nil {
