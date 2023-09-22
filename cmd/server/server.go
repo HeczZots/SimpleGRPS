@@ -16,9 +16,11 @@ import (
 func main() {
 	listenPort := flag.String("p", ":8080", "enter server port")
 	flag.Parse()
+
 	lis, err := net.Listen("tcp", *listenPort)
 	if err != nil {
 	}
+
 	s := grpc.NewServer()
 	pb.RegisterDataServiceServer(s, &handlers.DataServiceServer{})
 

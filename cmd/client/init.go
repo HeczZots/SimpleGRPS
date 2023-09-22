@@ -16,13 +16,13 @@ type Flags struct {
 }
 
 func GetParams() *Flags {
-	host := flag.String("h", "localhost", "enter host url")
-	port := flag.String("p", ":8080", "enter server port")
-	login := flag.String("login", "admin", "enter your login")
-	pass := flag.String("pass", "admin", "enter your password")
-	ts := flag.Int64("t", 100, "enter frequency in ms")
-	b := flag.Int("b", 100, "enter buffer capacity")
-	ttl := flag.Duration("ttl", time.Second*10, "enter time to live conn")
+	host := flag.String("h", defaultHost, "enter host url")
+	port := flag.String("p", defaultPort, "enter server port")
+	login := flag.String("login", defaultLogin, "enter your login")
+	pass := flag.String("pass", defaultPassword, "enter your password")
+	ts := flag.Int64("t", defaultTimeLaps, "enter frequency in ms")
+	b := flag.Int("b", defaultCapacity, "enter buffer capacity")
+	ttl := flag.Duration("ttl", defaultTimeToLive, "enter time to live conn")
 	flag.Parse()
 	return &Flags{
 		Host:           *host,
