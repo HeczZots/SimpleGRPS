@@ -7,7 +7,10 @@ all: clean client server ./server ./client
 
 start:./server ./client
 
-build: client server
+mod: 
+	go mod tidy
+
+build: mod client server
 
 client:
 	$(CC) $(CLIENT)
