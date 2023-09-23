@@ -5,28 +5,17 @@ package main
 
 import (
 	"fmt"
-	"log"
-	"time"
-
 	"gRPC/internal/api/caches"
 	"gRPC/internal/api/handlers"
 	pb "gRPC/internal/api/proto"
+	"gRPC/internal/config"
+	"log"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-const (
-	defaultPort       = ":8080"
-	defaultHost       = "localhost"
-	defaultLogin      = "admin"
-	defaultPassword   = "admin"
-	defaultTimeLaps   = 100
-	defaultTimeToLive = time.Second * 1
-	defaultCapacity   = 50
-)
-
-var p *Flags
+var p *config.Flags
 var conn *grpc.ClientConn
 var client pb.DataServiceClient
 var stream pb.DataService_StartServerClient
@@ -34,7 +23,7 @@ var receiver *handlers.Controler
 var buffer *caches.Buffer
 
 func main() {
-	p = getParams()
+	p = config.ParseFlags()
 	url := p.Host + p.Port
 	conn, err := grpc.Dial(url, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
