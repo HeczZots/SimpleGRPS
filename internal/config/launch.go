@@ -6,8 +6,6 @@ import (
 )
 
 type Flags struct {
-	Host           string
-	Port           string
 	TS             int64
 	BufferCapacity int
 	TTL            time.Duration
@@ -16,8 +14,6 @@ type Flags struct {
 }
 
 const (
-	defaultPort       = ":8080"
-	defaultHost       = "localhost"
 	defaultLogin      = "admin"
 	defaultPassword   = "admin"
 	defaultTimeLaps   = 100
@@ -26,8 +22,6 @@ const (
 )
 
 func ParseFlags() *Flags {
-	host := flag.String("h", defaultHost, "enter host url")
-	port := flag.String("p", defaultPort, "enter server port")
 	login := flag.String("login", defaultLogin, "enter your login")
 	pass := flag.String("pass", defaultPassword, "enter your password")
 	ts := flag.Int64("t", defaultTimeLaps, "enter frequency in ms")
@@ -35,8 +29,6 @@ func ParseFlags() *Flags {
 	ttl := flag.Duration("ttl", defaultTimeToLive, "enter time to live conn")
 	flag.Parse()
 	return &Flags{
-		Host:           *host,
-		Port:           *port,
 		TS:             *ts,
 		TTL:            *ttl,
 		BufferCapacity: *b,

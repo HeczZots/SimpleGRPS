@@ -4,6 +4,7 @@ client
 package main
 
 import (
+	"flag"
 	"fmt"
 	"gRPC/internal/api/caches"
 	"gRPC/internal/api/handlers"
@@ -15,6 +16,11 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
+const (
+	defaultPort = ":8080"
+	defaultHost = "localhost"
+)
+
 var p *config.Flags
 var conn *grpc.ClientConn
 var client pb.DataServiceClient
@@ -24,20 +30,18 @@ var buffer *caches.Buffer
 
 func main() {
 	p = config.ParseFlags()
-	url := p.Host + p.Port
+	host := flag.String("host", defaultHost, "enter host")
+	port := flag.String("port", defaultPort, "enter port in format \":5555\"")
+	flag.Parse()
+	url := *host + *port
 	conn, err := grpc.Dial(url, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("error to dial connection: %v", err)
 	}
+
 	defer conn.Close()
 	log.Println("Connection succesful")
-
 	client = pb.NewDataServiceClient(conn)
-	// authRequest := &pb.AuthRequest{
-	// 	Login:    p.Login,
-	// 	Password: p.Password,
-	// }
-	// _, err = client.Authenticate(context.Background(), authRequest)
 	err = authenticate(client, p.Login, p.Password)
 	if err != nil {
 		log.Fatalf("Auth error: %v", err)
