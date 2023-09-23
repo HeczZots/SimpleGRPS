@@ -19,6 +19,7 @@ type DataServiceServer struct {
 func NewService() *DataServiceServer {
 	return &DataServiceServer{Users: db.NewDataBase()}
 }
+
 func (s *DataServiceServer) Authenticate(ctx context.Context, in *pb.AuthRequest) (*emptypb.Empty, error) {
 	user := in.GetLogin()
 	pass := in.GetPassword()

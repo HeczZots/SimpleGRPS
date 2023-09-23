@@ -30,10 +30,12 @@ var buffer *caches.Buffer
 
 func main() {
 	p = config.ParseFlags()
+
 	host := flag.String("host", defaultHost, "enter host")
 	port := flag.String("port", defaultPort, "enter port in format \":5555\"")
 	flag.Parse()
 	url := *host + *port
+
 	conn, err := grpc.Dial(url, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("error to dial connection: %v", err)
@@ -41,6 +43,7 @@ func main() {
 
 	defer conn.Close()
 	log.Println("Connection succesful")
+
 	client = pb.NewDataServiceClient(conn)
 	err = authenticate(client, p.Login, p.Password)
 	if err != nil {
