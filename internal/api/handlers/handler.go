@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"errors"
 	"gRPC/internal/api/db"
 	pb "gRPC/internal/api/proto"
 	"log"
@@ -14,23 +13,21 @@ import (
 // Реализация gRPC-сервиса.
 type DataServiceServer struct {
 	pb.UnimplementedDataServiceServer
-	Clients *db.Clients
+	Users *db.Users
 }
 
 func NewService() *DataServiceServer {
-	return &DataServiceServer{
-		Clients: db.NewClients(),
-	}
+	return &DataServiceServer{Users: db.NewDataBase()}
 }
-
 func (s *DataServiceServer) Authenticate(ctx context.Context, in *pb.AuthRequest) (*emptypb.Empty, error) {
-	l := in.GetLogin()
-	p := in.GetPassword()
-	ok := s.Clients.ActiveSessions(l, p)
+	user := in.GetLogin()
+	pass := in.GetPassword()
+	ok := s.Users.AddUser(user, pass)
 	if !ok {
-		return nil, errors.New("auth already exist")
+		log.Printf("Auth already done. Login: %s", user)
+		return nil, nil
 	}
-	log.Printf("Auth received. Log: %s, Pass: %s\n", l, p)
+	log.Printf("Auth received. Log: %s, Pass: %s\n", user, pass)
 	return &emptypb.Empty{}, nil
 }
 
@@ -39,13 +36,12 @@ func (s *DataServiceServer) StartServer(in *pb.DataRequest, stream pb.DataServic
 	for i := int64(1); ; i++ {
 		select {
 		case <-stream.Context().Done():
-			log.Printf("Client closed connection.")
-			s.Clients.ViewActiveSessions()
-			// s.Clients.CloseAuth(in.GetStreamName())
+			log.Printf("Client %v closed connection", in.Login)
+			s.Users.CloseUserConnection(in.Login)
 			return nil
 		case <-time.After(interval):
 			response := &pb.DataResponse{Value: i}
-			log.Println("data send: to user: ", response.Value)
+			log.Printf("data sended:%v to %v", response.Value, in.Login)
 			if err := stream.Send(response); err != nil {
 				return err
 			}

@@ -1,47 +1,31 @@
 package db
 
-import (
-	"log"
-	"sync"
-)
+import "sync"
 
-type Clients struct {
-	Users map[string]string
-	mu    sync.Mutex
+type Users struct {
+	Map map[string]string
+	mu  sync.RWMutex
 }
 
-func NewClients() *Clients {
-	bd := make(map[string]string)
-	return &Clients{Users: bd}
+func NewDataBase() *Users {
+	u := new(Users)
+	u.Map = make(map[string]string)
+	return u
 }
 
-func (cs *Clients) addUser(login string, pass string) {
-	cs.mu.Lock()
-	defer cs.mu.Unlock()
-	cs.Users[login] = pass
-}
-
-func (cs *Clients) ActiveSessions(login string, pass string) bool {
-	cs.mu.Lock()
-	defer cs.mu.Unlock()
-	if _, ok := cs.Users[login]; !ok {
-		cs.addUser(login, pass)
+func (u *Users) AddUser(user, password string) bool {
+	u.mu.Lock()
+	defer u.mu.Unlock()
+	if _, ok := u.Map[user]; !ok {
+		u.Map[user] = password
 	} else {
 		return false
 	}
 	return true
 }
-func (cs *Clients) CloseAuth(l string) {
-	cs.mu.Lock()
-	defer cs.mu.Unlock()
-	delete(cs.Users, l)
-}
-func (cs *Clients) ViewActiveSessions() {
-	cs.mu.Lock()
-	defer cs.mu.Unlock()
-	i := 1
-	for k := range cs.Users {
-		log.Printf("user#%v %v\n", i, k)
-		i++
-	}
+
+func (u *Users) CloseUserConnection(user string) {
+	u.mu.Lock()
+	defer u.mu.Unlock()
+	delete(u.Map, user)
 }
