@@ -21,7 +21,9 @@ const (
 	defaultCapacity   = 50
 )
 
-func ParseFlags() *Flags {
+func ParseFlags(dHost, dPort string) (*Flags, string) {
+	host := flag.String("host", dHost, "enter host")
+	port := flag.String("port", dPort, "enter port in format \":5555\"")
 	login := flag.String("login", defaultLogin, "enter your login")
 	pass := flag.String("pass", defaultPassword, "enter your password")
 	ts := flag.Int64("t", defaultTimeLaps, "enter frequency in ms")
@@ -34,5 +36,5 @@ func ParseFlags() *Flags {
 		BufferCapacity: *b,
 		Login:          *login,
 		Password:       *pass,
-	}
+	}, *host + *port
 }

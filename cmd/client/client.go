@@ -4,7 +4,6 @@ client
 package main
 
 import (
-	"flag"
 	"fmt"
 	"gRPC/internal/api/caches"
 	"gRPC/internal/api/handlers"
@@ -27,22 +26,17 @@ var client pb.DataServiceClient
 var stream pb.DataService_StartServerClient
 var receiver *handlers.Controler
 var buffer *caches.Buffer
+var url string
 
 func main() {
-	p = config.ParseFlags()
-
-	host := flag.String("host", defaultHost, "enter host")
-	port := flag.String("port", defaultPort, "enter port in format \":5555\"")
-	flag.Parse()
-	url := *host + *port
-
+	p, url = config.ParseFlags(defaultHost, defaultPort)
 	conn, err := grpc.Dial(url, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("error to dial connection: %v", err)
 	}
 
 	defer conn.Close()
-	log.Println("Connection succesful")
+	log.Println("Connection successful")
 
 	client = pb.NewDataServiceClient(conn)
 	err = authenticate(client, p.Login, p.Password)

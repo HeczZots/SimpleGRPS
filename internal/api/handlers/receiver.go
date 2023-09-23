@@ -29,6 +29,9 @@ func (c *Controler) GetData(d time.Duration, buffer *caches.Buffer, stream pb.Da
 			break
 		}
 		buffer.Insert(response.Value, time.Now())
+		if i <= 1 {
+			log.Printf("Buffer capacity %v reached\n", buffer.Capacity)
+		}
 	}
 	wg.Done()
 }

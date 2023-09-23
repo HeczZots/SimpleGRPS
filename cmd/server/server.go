@@ -20,7 +20,7 @@ var s *grpc.Server
 var listenPort *string
 
 func main() {
-	listenPort := flag.String("p", defaultPort, "enter server port")
+	listenPort := flag.String("p", defaultPort, "enter port in format \":5555\"")
 	flag.Parse()
 
 	lis, err := net.Listen("tcp", *listenPort)
