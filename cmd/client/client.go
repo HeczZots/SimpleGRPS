@@ -36,7 +36,6 @@ var buffer *caches.Buffer
 func main() {
 	p = getParams()
 	url := p.Host + p.Port
-	//без grpc.WithInsecure() не работает(нужно разобраться)
 	conn, err := grpc.Dial(url, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("error to dial connection: %v", err)

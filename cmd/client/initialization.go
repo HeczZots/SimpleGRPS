@@ -42,20 +42,18 @@ func getParams() *Flags {
 }
 
 func authenticate(client pb.DataServiceClient, l, p string) (err error) {
-	authRequest := &pb.AuthRequest{
+	_, err = client.Authenticate(context.Background(), &pb.AuthRequest{
 		Login:    l,
 		Password: p,
-	}
-	_, err = client.Authenticate(context.Background(), authRequest)
+	})
 	return err
 }
 
 func startStream(client pb.DataServiceClient, ts int32, l string) (err error) {
-	dataRequest := &pb.DataRequest{
+	stream, err = client.StartServer(context.Background(), &pb.DataRequest{
 		IntervalMs: ts,
 		Login:      l,
-	}
-	stream, err = client.StartServer(context.Background(), dataRequest)
+	})
 	if err != nil {
 		return err
 	}
